@@ -50,7 +50,7 @@ def start_app(folder, port):
 # Keep Render Alive
 # -----------------------------
 def keep_render_alive():
-    RENDER_URL = "https://sagar-ai.onrender.com"
+    RENDER_URL = "https://sagar-all-api.onrender.com"
     
     def ping_render():
         while True:
