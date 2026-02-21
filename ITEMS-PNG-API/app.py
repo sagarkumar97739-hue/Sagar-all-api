@@ -44,43 +44,34 @@ with app.app_context():
 
 @app.route('/item-image')
 def get_item_image():
-    """Direct image API - returns raw PNG without background"""
+    """Direct image API - returns raw PNG from jsDelivr CDN"""
+
     item_id = request.args.get('id')
     key = request.args.get('key')
 
-    # Validate key    
-    if key != 'SAGAR':    
-        abort(403, description="Invalid key")    
-  
-    if not item_id:    
-        abort(400, description="Item ID is required")    
-  
-    # Check repositories 1 to 6 (updated to include repo 6)
-    for repo_num in range(1, 7):    
-        # Determine batch range for this repo    
-        if repo_num == 1:    
-            # First repo has batches 01-06    
-            batch_range = range(1, 7)    
-        else:    
-            # Subsequent repos start from batch 07, 13, 19, 25, 31
-            start_batch = (repo_num - 1) * 6 + 1    
-            batch_range = range(start_batch, start_batch + 6)    
-            
-        # Check each batch in this repository    
-        for batch_num in batch_range:    
-            # Format batch number with leading zero    
-            batch_str = f"{batch_num:02d}"    
-                
-            # Construct the URL    
-            url = f"https://raw.githubusercontent.com/djdndbdjfi/free-fire-items-{repo_num}/main/items/batch-{batch_str}/{item_id}.png"    
-                
-            # Check if image exists    
-            response = requests.head(url)    
-            if response.status_code == 200:    
-                return redirect(url)    
-  
-    # If no image found in any repository    
-    abort(404, description="Item image not found")
+    # 🔐 Validate key
+    if key != 'SAGAR':
+        abort(403, description="Invalid key")
+
+    # 📌 Validate item ID
+    if not item_id:
+        abort(400, description="Item ID is required")
+
+    # 🌍 CDN Image URL
+    image_url = f"https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/{item_id}.png"
+
+    try:
+        # Check if image exists
+        response = requests.head(image_url, timeout=5)
+
+        if response.status_code != 200:
+            abort(404, description="Item image not found")
+
+        # Redirect to CDN image
+        return redirect(image_url)
+
+    except requests.RequestException:
+        abort(502, description="Failed to connect to image server")
 
 @app.route('/iteminfo', methods=['GET'])
 def get_item_info():
