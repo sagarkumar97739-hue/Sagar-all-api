@@ -4,6 +4,7 @@ import threading
 import time
 import socket
 import requests
+from datetime import datetime
 from flask import Flask, request, Response
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -44,6 +45,30 @@ def start_app(folder, port):
             return
         time.sleep(0.5)
     print(f"[⚠️] {folder} failed to start in time")
+
+# -----------------------------
+# Keep Render Alive
+# -----------------------------
+def keep_render_alive():
+    RENDER_URL = "https://sagar-ai.onrender.com"
+    
+    def ping_render():
+        while True:
+            try:
+                time.sleep(300)
+                current_time = datetime.now().strftime("%H:%M:%S")
+                try:
+                    response = requests.get(f"{RENDER_URL}/sagar", timeout=10)
+                    print(f"[RENDER PING] ✅ Ping successful at {current_time} - Status: {response.status_code}")
+                except Exception as e:
+                    print(f"[RENDER PING] ❌ Failed at {current_time}: {e}")
+            except Exception as e:
+                print(f"[RENDER PING] ❌ Error in ping thread: {e}")
+                time.sleep(60)
+
+    ping_thread = threading.Thread(target=ping_render, daemon=True)
+    ping_thread.start()
+    print(f"[RENDER PING] 🚀 Auto-ping started: {RENDER_URL} (every 5 minutes)")
 
 # -----------------------------
 # Proxy requests
@@ -105,6 +130,8 @@ def main():
 
     time.sleep(3)
     print("[✅] All sub-apps initialized:", running_apps)
+    
+    keep_render_alive()
 
     main_port = int(os.environ.get("PORT", 8000))
     print(f"[🌐] Main Flask host running on PORT={main_port}")
