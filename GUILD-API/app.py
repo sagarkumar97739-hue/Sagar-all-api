@@ -14,7 +14,7 @@ import encode_id_clan_pb2
 
 # ===================== CONFIG =====================
 app = Flask(__name__)
-freefire_version = "OB52"
+freefire_version = "OB54"
 key = bytes([89, 103, 38, 116, 99, 37, 68, 69, 117, 104, 54, 37, 90, 99, 94, 56])
 iv = bytes([54, 111, 121, 90, 68, 114, 50, 50, 69, 51, 121, 99, 104, 106, 77, 37])
 jwt_tokens = {}  # Store tokens by region
