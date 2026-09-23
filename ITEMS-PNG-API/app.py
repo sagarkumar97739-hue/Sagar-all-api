@@ -100,7 +100,7 @@ def get_combined_item_image(itemid):
         return jsonify({"error": "Item data not loaded. Check server logs."}), 500
 
     # 1. Find item details from main.json    
-    item_found = next((item for item in item_data if item.get("Id") == itemid), None)    
+    item_found = next((item for item in item_data if item.get("itemID") == itemid), None)    
 
     if not item_found:    
         app.logger.warning(f"Item with ID {itemid} not found in {ITEM_DATA_FILE}")    
